@@ -4,5 +4,7 @@
 {% endblock %}
 
 {% block content %}
+    Last trade added: {{ lastTradeAdded.quantity }}x {{ lastTradeAdded.stock.symbol }} @ {{ lastTradeAdded.executedAt|date('Y-m-d h:i:s') }}
+
     {{ form(form) }}
 {% endblock %}

@@ -19,32 +19,35 @@ class StockRepository extends ServiceEntityRepository
         parent::__construct($registry, Stock::class);
     }
 
-    // /**
-    //  * @return Stock[] Returns an array of Stock objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    public function getAccountValue() {
+        $stocks = $this->findAll();
 
-    /*
-    public function findOneBySomeField($value): ?Stock
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $totalCash              = 0;
+        $totalStockValueLong    = 0;
+        $totalStockValueShort   = 0;
+        $totalStockValueOption  = 0;
+
+        foreach ($stocks as $stock) {
+            $stockValueLong     = $stock->getPrice() *$stock->getQuantity('Long');
+            $stockValueShort    = $stock->getPrice() *$stock->getQuantity('Short');
+
+            $totalStockValueLong    += $stockValueLong;
+            $totalStockValueShort   += $stockValueShort;
+        }
+
+        return $totalCash +$totalStockValueLong +$totalStockValueOption -$totalStockValueShort;
     }
-    */
+
+    public function getBuyingPower() {
+        return 0;
+    }
+
+    public function getCash() {
+        return 0;
+    }
+
+    public function getAnnualReturn() {
+        return 0;
+    }
+
 }

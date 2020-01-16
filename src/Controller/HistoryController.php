@@ -56,8 +56,13 @@ class HistoryController extends AbstractController {
             }
         }
 
+        $lastTradeAdded = $tradeRepo->findOneBy([], [
+            'executedAt' => 'DESC'
+        ]);
+
         return $this->render('history/addRawTrades.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'lastTradeAdded' => $lastTradeAdded
         ]);
     }
 

@@ -17,3 +17,7 @@ long_main:
 short_main:
     path: /portfolio/short
     controller: App\Controller\ShortController::view
+
+call_main:
+    path: /portfolio/call
+    controller: App\Controller\CallController::view

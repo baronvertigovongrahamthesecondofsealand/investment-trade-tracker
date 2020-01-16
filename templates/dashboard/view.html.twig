@@ -4,35 +4,20 @@
 {% endblock %}
 
 {% block content %}
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Trade type</th>
-            <th>Order type</th>
-            <th>Description</th>
-            <th>Symbol</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Fee</th>
-            <th>Total</th>
-        </tr>
-        </thead>
-
-        <tbody>
-{#        {% for trade in trades %}#}
-        <tr>
-{#            <td>{{ trade.executedAt|date('Y-m-d H:i:s') }}</td>#}
-{#            <td>{{ trade.tradeType }}</td>#}
-{#            <td>{{ trade.orderType }}</td>#}
-{#            <td>{{ trade.description }}</td>#}
-{#            <td>{{ trade.stock.symbol }}</td>#}
-{#            <td>{{ trade.quantity }}</td>#}
-{#            <td>{{ trade.price }}</td>#}
-{#            <td>{{ trade.fee }}</td>#}
-{#            <td>{{ trade.total }}</td>#}
-        </tr>
-{#        {% endfor %}#}
-        </tbody>
-    </table>
+    <div class="infoblock">
+        <span class="metric">Account value</span>
+        <span class="value">{{ accountValue }}</span>
+    </div>
+    <div class="infoblock">
+        <span class="metric">Buying power</span>
+        <span class="value">{{ buyingpower }}</span>
+    </div>
+    <div class="infoblock">
+        <span class="metric">Cash</span>
+        <span class="value">{{ cash }}</span>
+    </div>
+    <div class="infoblock">
+        <span class="metric">Annual return</span>
+        <span class="value">{{ annualReturn }}</span>
+    </div>
 {% endblock %}

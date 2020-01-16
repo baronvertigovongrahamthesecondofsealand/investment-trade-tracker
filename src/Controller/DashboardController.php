@@ -15,27 +15,16 @@ class DashboardController extends AbstractController {
     public function view(Request $request, TradeManager $tradeManager) {
         $em = $this->getDoctrine()->getManager();
 
-//        $stocks = $em->getRepository('App:Stock')->createQueryBuilder('s')
-//            ->leftJoin('s.trades', 't')
-//            ->andWhere('t.trade_type = :tradetype')
-//            ->addOrderBy('t.executedAt', 'ASC')
-//            ->getQuery()
-//            ->execute([
-//                'tradetype' => 'Short'
-//            ]);
-
-//        /** @var Stock[] $stocks */
-//        foreach ($stocks as $stock) {
-//            foreach ($stock->getTrades() as $trade) {
-//                $trade->setAdjustedPrice($tradeManager->getTradeAdjustedPrice($trade));
-//                $em->persist($trade);
-//            }
-//        }
-//
-//        $em->flush();
+        $accountValue   = $em->getRepository('App:Stock')->getAccountValue();
+        $buyingpower    = $em->getRepository('App:Stock')->getBuyingPower();
+        $cash           = $em->getRepository('App:Stock')->getCash();
+        $annualReturn   = $em->getRepository('App:Stock')->getAnnualReturn();
 
         return $this->render('dashboard/view.html.twig', [
-//            'stocks' => $stocks
+            'accountValue'  => $accountValue,
+            'buyingpower'   => $buyingpower,
+            'cash'          => $cash,
+            'annualReturn'  => $annualReturn
         ]);
     }
 

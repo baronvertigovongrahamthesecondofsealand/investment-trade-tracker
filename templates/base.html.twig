@@ -19,6 +19,7 @@
                 <a class="btn btn-{% if app.request.get('_route') not in ['history_main'] %}outline-{% endif %}primary" href="{{ url('history_main') }}">Trade history</a>
                 <a class="btn btn-{% if app.request.get('_route') not in ['long_main'] %}outline-{% endif %}primary" href="{{ url('long_main') }}">Portfolio long</a>
                 <a class="btn btn-{% if app.request.get('_route') not in ['short_main'] %}outline-{% endif %}primary" href="{{ url('short_main') }}">Portfolio short</a>
+                <a class="btn btn-{% if app.request.get('_route') not in ['call_main'] %}outline-{% endif %}primary" href="{{ url('call_main') }}">Portfolio option</a>
             </nav>
 
             {% if app.request.get('_route') in ['history_main', 'history_add_raw_trades'] %}
