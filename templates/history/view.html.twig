@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block extranav %}
+{% endblock %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Trade type</th>
+            <th>Order type</th>
+            <th>Description</th>
+            <th>Symbol</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Fee</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for trade in trades %}
+        <tr>
+            <td>{{ trade.executedAt|date('Y-m-d H:i:s') }}</td>
+            <td>{{ trade.tradeType }}</td>
+            <td>{{ trade.orderType }}</td>
+            <td>{{ trade.description }}</td>
+            <td>{{ trade.stock.symbol }}</td>
+            <td>{{ trade.quantity }}</td>
+            <td>{{ trade.price }}</td>
+            <td>{{ trade.fee }}</td>
+            <td>{{ trade.total }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

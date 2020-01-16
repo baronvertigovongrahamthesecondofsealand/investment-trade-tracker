@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Quantity</th>
+            <th>Traded price</th>
+            <th>Traded value</th>
+            <th>Current price</th>
+            <th>Current value</th>
+            <th>Gain</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for stock in stocks %}
+            {% if stock.quantity('Short') %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.quantity('Short') }}</td>
+                    <td>${{ stock.adjustedPrice('Short')|round(2)|number_format(2) }}</td>
+                    <td>${{ (stock.adjustedPrice('Short') *stock.quantity('Short'))|round(2)|number_format(2) }}</td>
+                    <td>${{ stock.price|round(2)|number_format(2) }}</td>
+                    <td>${{ (stock.price *stock.quantity('Short'))|round(2)|number_format(2) }}</td>
+                    <td>
+                        {% if stock.adjustedPrice('Short') %}
+                            {{ stock.gain('Short') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                        %
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Quantity</th>
+            <th>Traded price</th>
+            <th>Traded value</th>
+            <th>Current price</th>
+            <th>Current value</th>
+            <th>Gain</th>
+        </tr>
+        </thead>
+
+        {% set total_quantity   = 0 %}
+        {% set total_invested   = 0 %}
+        {% set total_value      = 0 %}
+
+        <tbody>
+        {% for stock in stocks %}
+            {% set total_quantity   = total_quantity +stock.quantity('Long') %}
+            {% set total_invested   = total_invested +(stock.adjustedPrice('Long') *stock.quantity('Long')) %}
+            {% set total_value      = total_value +(stock.price *stock.quantity('Long')) %}
+
+            {% if stock.quantity('Long') %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.quantity('Long') }}</td>
+                    <td>${{ stock.adjustedPrice('Long')|round(2)|number_format(2) }}</td>
+                    <td>${{ (stock.adjustedPrice('Long') *stock.quantity('Long'))|round(2)|number_format(2) }}</td>
+                    <td>${{ stock.price|round(2)|number_format(2) }}</td>
+                    <td>${{ (stock.price *stock.quantity('Long'))|round(2)|number_format(2) }}</td>
+                    <td>
+                        {% if (stock.quantity('Long')) %}
+                            {{ stock.gain('Long') }}
+                        {% else %}
+                            0
+                        {% endif %}%
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        <tr>
+            <td>Totals:</td>
+            <td>{{ total_quantity }}</td>
+            <td></td>
+            <td>{{ total_invested }}</td>
+            <td></td>
+            <td>{{ total_value }}</td>
+            <td>{{ (1 -(total_invested /total_value)) *100 }}%</td>
+        </tr>
+        </tbody>
+    </table>
+{% endblock %}

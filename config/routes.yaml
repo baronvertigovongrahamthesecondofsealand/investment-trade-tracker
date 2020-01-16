@@ -1,0 +1,19 @@
+dashboard:
+    path: /
+    controller: App\Controller\DashboardController::view
+
+history_main:
+    path: /history
+    controller: App\Controller\HistoryController::view
+
+history_add_raw_trades:
+    path: /history/addRawTrades
+    controller: App\Controller\HistoryController::addRawTrades
+
+long_main:
+    path: /portfolio/long
+    controller: App\Controller\LongController::view
+
+short_main:
+    path: /portfolio/short
+    controller: App\Controller\ShortController::view
