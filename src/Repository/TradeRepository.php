@@ -48,11 +48,11 @@ class TradeRepository extends ServiceEntityRepository
             $trade->setTotal($trade_data_row[6]);
             $trade->setTradeType($this->tradeManager->getTradeType($trade));
             $trade->setOrderType($this->tradeManager->getOrderType($trade));
-            $trade->setAdjustedPrice($this->tradeManager->getTradeAdjustedPrice($trade));
 
             $stock = $this->tradeManager->createOrGetStock($trade, $trade_data_row[2]);
 
             $trade->setStock($stock);
+            $trade->setAdjustedPrice($this->tradeManager->getTradeAdjustedPrice($trade));
 
             $new_trades[] = $trade;
         }
@@ -64,7 +64,7 @@ class TradeRepository extends ServiceEntityRepository
      * @param Trade $trade
      * @return Trade[]
      */
-    public function findHistoricalRelatedTrades(Trade $trade) {
+    public function findHistoricalRelatedTrades(Trade $trade, $symbol = null) {
         return $this->createQueryBuilder('t')
             ->leftJoin('t.stock', 's')
             ->andWhere('s.symbol = :symbol')

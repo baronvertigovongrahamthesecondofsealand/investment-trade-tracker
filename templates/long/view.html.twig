@@ -49,7 +49,14 @@
             <td>{{ total_invested }}</td>
             <td></td>
             <td>{{ total_value }}</td>
-            <td>{{ (1 -(total_invested /total_value)) *100 }}%</td>
+            <td>
+                {% if total_value > 0 %}
+                    {{ (1 -(total_invested /total_value)) *100 }}
+                {% else %}
+                    0
+                {% endif %}
+                %
+            </td>
         </tr>
         </tbody>
     </table>

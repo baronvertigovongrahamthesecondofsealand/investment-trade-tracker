@@ -150,9 +150,11 @@ class Stock
     }
 
     public function getGain($tradeType) {
-        if ($tradeType == 'Long') {
+        if ($this->getPrice() <= 0) {
+            $gain = 0;
+        } elseif ($tradeType == 'Long' && $this->getAdjustedPrice('Long')) {
             $gain = (($this->getPrice() /$this->getAdjustedPrice('Long')) -1) *100;
-        } elseif ($tradeType == 'Short') {
+        } elseif ($tradeType == 'Short' && $this->getAdjustedPrice('Short')) {
             $gain = (1- ($this->getPrice() /$this->getAdjustedPrice('Short'))) *100;
         } else {
             $gain = 0;
