@@ -17,6 +17,8 @@
     },
     "dependencies": {
         "bootstrap": "^4.4.1",
+        "jquery": "^3.4.1",
+        "popper": "^1.0.1",
         "scss": "^0.2.4"
     }
 }

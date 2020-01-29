@@ -15,16 +15,23 @@
     <header class="container-fluid">
         {% block nav %}
             <nav class="btn-group">
-                <a class="btn btn-{% if app.request.get('_route') not in ['dashboard'] %}outline-{% endif %}primary" href="{{ url('dashboard') }}">Dashboard</a>
-                <a class="btn btn-{% if app.request.get('_route') not in ['history_main'] %}outline-{% endif %}primary" href="{{ url('history_main') }}">Trade history</a>
-                <a class="btn btn-{% if app.request.get('_route') not in ['long_main'] %}outline-{% endif %}primary" href="{{ url('long_main') }}">Portfolio long</a>
-                <a class="btn btn-{% if app.request.get('_route') not in ['short_main'] %}outline-{% endif %}primary" href="{{ url('short_main') }}">Portfolio short</a>
-                <a class="btn btn-{% if app.request.get('_route') not in ['call_main'] %}outline-{% endif %}primary" href="{{ url('call_main') }}">Portfolio option</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['dashboard'] %} disabled{% endif %}" href="{{ url('dashboard') }}">Dashboard</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['history_main'] %} disabled{% endif %}" href="{{ url('history_main') }}">Trade history</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['transaction_main'] %} disabled{% endif %}" href="{{ url('transaction_main') }}">Corporate action</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['long_main'] %} disabled{% endif %}" href="{{ url('long_main') }}">Portfolio long</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['short_main'] %} disabled{% endif %}" href="{{ url('short_main') }}">Portfolio short</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['option_main'] %} disabled{% endif %}" href="{{ url('option_main') }}">Portfolio option</a>
             </nav>
 
-            {% if app.request.get('_route') in ['history_main', 'history_add_raw_trades'] %}
+            {% if app.request.get('_route') in ['history_main', 'history_add'] %}
             <nav class="btn-group">
-                <a class="btn btn-{% if app.request.get('_route') not in ['history_add_raw_trades'] %}outline-{% endif %}primary" href="{{ url('history_add_raw_trades') }}">Add more trades</a>
+                <a class="btn btn-primary{% if app.request.get('_route') in ['history_add'] %} disabled{% endif %}" href="{{ url('history_add') }}">Add more trades</a>
+            </nav>
+            {% endif %}
+
+            {% if app.request.get('_route') in ['transaction_main', 'transaction_add'] %}
+            <nav class="btn-group">
+                <a class="btn btn-primary{% if app.request.get('_route') in ['transaction_add'] %} disabled{% endif %}" href="{{ url('transaction_add') }}">Add more actions</a>
             </nav>
             {% endif %}
 
@@ -32,7 +39,7 @@
         {% endblock %}
     </header>
 
-    <main class="container">
+    <main class="container-fluid">
         {% block content %}{% endblock %}
     </main>
 

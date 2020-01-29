@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Trade;
 use App\Services\TradeManager;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
@@ -46,13 +45,13 @@ class TradeRepository extends ServiceEntityRepository
             $trade->setPrice($trade_data_row[4]);
             $trade->setFee($trade_data_row[5]);
             $trade->setTotal($trade_data_row[6]);
-            $trade->setTradeType($this->tradeManager->getTradeType($trade));
-            $trade->setOrderType($this->tradeManager->getOrderType($trade));
+            $trade->setTradeType($this->tradeManager->getTradeType($trade_data_row[1]));
+            $trade->setOrderType($this->tradeManager->getOrderType($trade_data_row[1]));
 
             $stock = $this->tradeManager->createOrGetStock($trade, $trade_data_row[2]);
 
             $trade->setStock($stock);
-            $trade->setAdjustedPrice($this->tradeManager->getTradeAdjustedPrice($trade));
+            $trade->setAdjustedPrice(0);
 
             $new_trades[] = $trade;
         }
@@ -78,4 +77,15 @@ class TradeRepository extends ServiceEntityRepository
                 'tradedate' => $trade->getExecutedAt()
             ]);
     }
+
+    public function getAllTrades() {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.stock', 's')
+            ->addOrderBy('t.executedAt', 'DESC')
+            ->addOrderBy('s.symbol', 'ASC')
+            ->addOrderBy('t.quantity', 'ASC')
+            ->getQuery()
+            ->execute();
+    }
+
 }

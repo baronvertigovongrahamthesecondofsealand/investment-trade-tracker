@@ -1,11 +1,11 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
+// import 'bootstrap';
+global.$ = global.jQuery = require('jquery');
+require('../vendor/tablesorter-2.31.2/dist/js/jquery.tablesorter.min');
 
-// Need jQuery? Install it with "yarn add jquery", then uncomment to import it.
-// import $ from 'jquery';
+$(function() {
 
-console.log('Hello Webpack Encore! Edit me in assets/js/app.js');
+    let app = {};
+
+    $('table.trade-data').tablesorter();
+
+});

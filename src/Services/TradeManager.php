@@ -14,8 +14,8 @@ class TradeManager {
         $this->em = $entityManager;
     }
 
-    public function createOrGetStock($trade, $symbol) {
-        $stockType = $this->getTradeType($trade) == 'Call' ? 'Option' : 'Stock';
+    public function createOrGetStock($record, $symbol) {
+        $stockType = $record->getTradeType() == 'Option' ? 'Option' : 'Stock';
 
         $stock = $this->em->getRepository('App:Stock')->findOneBy([
             'symbol' => $symbol
@@ -32,40 +32,44 @@ class TradeManager {
         return $stock;
     }
 
-    public function getTradeType(Trade $trade) {
-        if (strpos($trade->getDescription(), 'Stock: Buy') !== false) {
+    public function getTradeType($description) {
+        if (strpos($description, 'Stock: Buy') !== false) {
             return 'Long';
-        } elseif (strpos($trade->getDescription(), 'Stock: Sell') !== false) {
+        } elseif (strpos($description, 'Stock: Sell') !== false) {
             return 'Long';
-        } elseif (strpos($trade->getDescription(), 'Short Stock: Short') !== false) {
+        } elseif (strpos($description, 'Short Stock: Short') !== false) {
             return 'Short';
-        } elseif (strpos($trade->getDescription(), 'Cover Stock: Cover') !== false) {
+        } elseif (strpos($description, 'Cover Stock: Cover') !== false) {
             return 'Short';
-        } elseif (strpos($trade->getDescription(), 'Option: Buy') !== false) {
-            return 'Call';
-        } elseif (strpos($trade->getDescription(), 'Option: Sell') !== false) {
-            return 'Call';
-        } elseif (strpos($trade->getDescription(), 'Option Expired') !== false) {
-            return 'Call';
+        } elseif (strpos($description, 'Option: Buy') !== false) {
+            return 'Option';
+        } elseif (strpos($description, 'Option: Sell') !== false) {
+            return 'Option';
+        } elseif (strpos($description, 'Option Expired') !== false) {
+            return 'Option';
+        } elseif (strpos($description, 'Dividend') !== false) {
+            return 'Dividend';
+        } elseif (strpos($description, 'Interest') !== false) {
+            return 'Interest';
         }
 
         return '-';
     }
 
-    public function getOrderType(Trade $trade) {
-        if (strpos($trade->getDescription(), 'Stock: Buy') !== false) {
+    public function getOrderType($description) {
+        if (strpos($description, 'Stock: Buy') !== false) {
             return 'Buy';
-        } elseif (strpos($trade->getDescription(), 'Stock: Sell') !== false) {
+        } elseif (strpos($description, 'Stock: Sell') !== false) {
             return 'Sell';
-        } elseif (strpos($trade->getDescription(), 'Short Stock: Short') !== false) {
+        } elseif (strpos($description, 'Short Stock: Short') !== false) {
             return 'Buy';
-        } elseif (strpos($trade->getDescription(), 'Cover Stock: Cover') !== false) {
+        } elseif (strpos($description, 'Cover Stock: Cover') !== false) {
             return 'Sell';
-        } elseif (strpos($trade->getDescription(), 'Option: Buy') !== false) {
+        } elseif (strpos($description, 'Option: Buy') !== false) {
             return 'Buy';
-        } elseif (strpos($trade->getDescription(), 'Option: Sell') !== false) {
+        } elseif (strpos($description, 'Option: Sell') !== false) {
             return 'Sell';
-        } elseif (strpos($trade->getDescription(), 'Option Expired') !== false) {
+        } elseif (strpos($description, 'Option Expired') !== false) {
             return 'Expired';
         }
 
@@ -117,8 +121,6 @@ class TradeManager {
                     $weightedAveragePrice = ($totalQuantity > 0) ? $totalValue / $totalQuantity : 0;
                 }
             }
-
-//            dump($hTrade->getId().": { totalQuantity: ".$totalQuantity.", price: ".$hTrade->getPrice().", totalValue: ".$totalValue.", weightedAveragePrice: ".$weightedAveragePrice." }");
         }
 
         return $weightedAveragePrice;

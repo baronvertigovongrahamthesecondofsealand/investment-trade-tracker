@@ -2,12 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Stock;
-use App\Entity\Trade;
 use App\Services\TradeManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 
 class DashboardController extends AbstractController {

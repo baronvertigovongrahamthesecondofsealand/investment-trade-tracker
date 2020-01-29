@@ -1,2 +1,37 @@
 @import "~bootstrap/scss/bootstrap";
+@import "../vendor/tablesorter-2.31.2/dist/css/theme.bootstrap_4.min.css";
 
+.trade-data, .trade-data .btn, nav .btn {
+    font-size: 12px;
+}
+.up {
+    color: green;
+}
+.down {
+    color: red;
+}
+.text {
+    text-align: left;
+}
+.number {
+    text-align: center;
+}
+.money, .ratio {
+    position: relative;
+    text-align: right;
+}
+.money {
+    padding-left: 20px !important;
+
+    &:after {
+        content: "$";
+        position: absolute;
+        height: 20px;
+        width: 10px;
+        top: 12px;
+        left: 10px;
+    }
+}
+.highlight {
+    background-color: #d4f1d4;
+}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block extranav %}
+{% endblock %}
+
+{% block content %}
+    <p>Copy new transactions from the corporate actions tables directly from the Investopedia page, and paste it here.</p>
+
+    {% if lastTransactionAdded %}
+        <p>
+            Last transaction added: {{ lastTransactionAdded.quantity }}x {{ lastTransactionAdded.stock.symbol }} @ {{ lastTransactionAdded.executedAt|date('Y-m-d h:i:s') }}
+        </p>
+    {% endif %}
+
+    {{ form(form) }}
+{% endblock %}

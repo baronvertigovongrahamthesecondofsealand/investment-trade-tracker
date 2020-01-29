@@ -43,9 +43,35 @@ class Stock
      */
     private $stockType;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $longTarget;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $shortTarget;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $callTarget;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $nextEarningsAt;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Transaction", mappedBy="stock")
+     */
+    private $transactions;
+
     public function __construct()
     {
         $this->trades = new ArrayCollection();
+        $this->transactions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,9 +118,29 @@ class Stock
     /**
      * @return Collection|Trade[]
      */
-    public function getTrades(): Collection
+    public function getTrades($type = null, $orderBy = null): Collection
     {
-        return $this->trades;
+        $trades = $this->trades;
+
+        if ($orderBy) {
+            $orderByField   = isset($orderBy[0]) && $orderBy[0] ? $orderBy[0] : 'executedAt';
+            $orderByDir     = isset($orderBy[1]) && $orderBy[1] != 'ASC' ? -1 : 1;
+
+            $iterator = $this->trades->getIterator();
+            $iterator->uasort(function ($a, $b) use ($orderByField, $orderByDir) {
+                return call_user_func([$a, 'get'.$orderByField]) < call_user_func([$b, 'get'.$orderByField]) ? !$orderByDir : $orderByDir;
+            });
+
+            $trades = new ArrayCollection(iterator_to_array($iterator));
+        }
+
+        if ($type) {
+            return $trades->filter(function($trade) use ($type) {
+                return $trade->getTradeType() == $type;
+            });
+        }
+
+        return $trades;
     }
 
     public function addTrade(Trade $trade): self
@@ -125,7 +171,7 @@ class Stock
 
         foreach ($this->getTrades() as $trade) {
             if ($trade->getTradeType() == $tradeType) {
-                $quantity += ($trade->getOrderType() == "Sell") ? -$trade->getQuantity() : $trade->getQuantity();
+                $quantity += ($trade->getOrderType() == "Sell" || $trade->getOrderType() == "Expired") ? -$trade->getQuantity() : $trade->getQuantity();
             }
         }
 
@@ -156,6 +202,8 @@ class Stock
             $gain = (($this->getPrice() /$this->getAdjustedPrice('Long')) -1) *100;
         } elseif ($tradeType == 'Short' && $this->getAdjustedPrice('Short')) {
             $gain = (1- ($this->getPrice() /$this->getAdjustedPrice('Short'))) *100;
+        } elseif ($tradeType == 'Option' && $this->getAdjustedPrice('Option')) {
+            $gain = (($this->getPrice() /$this->getAdjustedPrice('Option')) -1) *100;
         } else {
             $gain = 0;
         }
@@ -171,6 +219,85 @@ class Stock
     public function setStockType(string $stockType): self
     {
         $this->stockType = $stockType;
+
+        return $this;
+    }
+
+    public function getLongTarget(): ?float
+    {
+        return $this->longTarget;
+    }
+
+    public function setLongTarget(?float $longTarget): self
+    {
+        $this->longTarget = $longTarget;
+
+        return $this;
+    }
+
+    public function getShortTarget(): ?float
+    {
+        return $this->shortTarget;
+    }
+
+    public function setShortTarget(?float $shortTarget): self
+    {
+        $this->shortTarget = $shortTarget;
+
+        return $this;
+    }
+
+    public function getCallTarget(): ?float
+    {
+        return $this->callTarget;
+    }
+
+    public function setCallTarget(?float $callTarget): self
+    {
+        $this->callTarget = $callTarget;
+
+        return $this;
+    }
+
+    public function getNextEarningsAt(): ?\DateTimeInterface
+    {
+        return $this->nextEarningsAt;
+    }
+
+    public function setNextEarningsAt(?\DateTimeInterface $nextEarningsAt): self
+    {
+        $this->nextEarningsAt = $nextEarningsAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Transaction[]
+     */
+    public function getTransactions(): Collection
+    {
+        return $this->transactions;
+    }
+
+    public function addTransaction(Transaction $transaction): self
+    {
+        if (!$this->transactions->contains($transaction)) {
+            $this->transactions[] = $transaction;
+            $transaction->setStock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(Transaction $transaction): self
+    {
+        if ($this->transactions->contains($transaction)) {
+            $this->transactions->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getStock() === $this) {
+                $transaction->setStock(null);
+            }
+        }
 
         return $this;
     }

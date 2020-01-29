@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+
+{% block extranav %}
+{% endblock %}
+
+{% block content %}
+    <p>Copy new trades from the trade history tables directly from the Investopedia page, and paste it here.</p>
+
+    {% if lastTradeAdded %}
+        <p>
+            Last trade added: {{ lastTradeAdded.quantity }}x {{ lastTradeAdded.stock.symbol }} @ {{ lastTradeAdded.executedAt|date('Y-m-d h:i:s') }}
+        </p>
+    {% endif %}
+
+    {{ form(form) }}
+{% endblock %}
