@@ -31,5 +31,11 @@
         </tbody>
     </table>
 
-    {{ form(form) }}
+    {{ form_start(form) }}
+    <div class="form-group">
+        <label for="targetGainCalc">Target gain</label>
+        <input type="number" step="0.01" id="targetGainCalc" class="form-control" data-buyprice="{{ stock.adjustedPrice(tradeType) }}" />
+    </div>
+    {{ form_rest(form) }}
+    {{ form_end(form) }}
 {% endblock %}

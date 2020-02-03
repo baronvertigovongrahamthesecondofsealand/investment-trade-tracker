@@ -42,9 +42,9 @@ class TradeRepository extends ServiceEntityRepository
             $trade->setDescription($trade_data_row[1]);
             $trade->setName($trade_data_row[2]);
             $trade->setQuantity($trade_data_row[3]);
-            $trade->setPrice($trade_data_row[4]);
-            $trade->setFee($trade_data_row[5]);
-            $trade->setTotal($trade_data_row[6]);
+            $trade->setPrice(preg_replace(':$|\s:', '', $trade_data_row[4]));
+            $trade->setFee(preg_replace(':$|\s:', '', $trade_data_row[5]));
+            $trade->setTotal(preg_replace(':$|\s:', '', $trade_data_row[6]));
             $trade->setTradeType($this->tradeManager->getTradeType($trade_data_row[1]));
             $trade->setOrderType($this->tradeManager->getOrderType($trade_data_row[1]));
 

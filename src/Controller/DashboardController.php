@@ -11,10 +11,10 @@ class DashboardController extends AbstractController {
     public function view(Request $request, TradeManager $tradeManager) {
         $em = $this->getDoctrine()->getManager();
 
-        $accountValue   = $em->getRepository('App:Stock')->getAccountValue();
-        $buyingpower    = $em->getRepository('App:Stock')->getBuyingPower();
-        $cash           = $em->getRepository('App:Stock')->getCash();
-        $annualReturn   = $em->getRepository('App:Stock')->getAnnualReturn();
+        $accountValue   = $tradeManager->getAccountValue();
+        $buyingpower    = $tradeManager->getBuyingPower();
+        $cash           = $tradeManager->getCash();
+        $annualReturn   = $tradeManager->getAnnualReturn();
 
         return $this->render('dashboard/view.html.twig', [
             'accountValue'  => $accountValue,

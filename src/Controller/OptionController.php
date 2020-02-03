@@ -13,18 +13,15 @@ class OptionController extends BaseController {
 
     public $tradeType       = 'Option';
     public $viewRoute       = 'option_main';
-    public $viewTemplate    = 'long/view.html.twig';
     public $detailRoute     = 'option_detail';
 
     public function detail(Request $request, TradeManager $tradeManager) {
-        $this->detailFormBuilder = $this->createFormBuilder(new Stock());
-        $this->detailFormBuilder
-            ->add('callTarget', NumberType::class)
-            ->add('price', NumberType::class)
-            ->add('nextEarningsAt', DateType::class, [
-                'data' => new \DateTime()
-            ])
-            ->add('submit', SubmitType::class);
+        $this->init($request);
+
+        $this->detailFormBuilder = $this->getDetailForm([
+            'callTarget' => NumberType::class,
+            'price' => NumberType::class,
+        ]);
 
         return parent::detail($request, $tradeManager);
     }

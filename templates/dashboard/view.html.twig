@@ -6,18 +6,18 @@
 {% block content %}
     <div class="infoblock">
         <span class="metric">Account value</span>
-        <span class="value">{{ accountValue }}</span>
+        <span class="value">${{ accountValue|round(2)|number_format(2) }}</span>
     </div>
     <div class="infoblock">
         <span class="metric">Buying power</span>
-        <span class="value">{{ buyingpower }}</span>
+        <span class="value">${{ buyingpower|round(2)|number_format(2) }}</span>
     </div>
     <div class="infoblock">
         <span class="metric">Cash</span>
-        <span class="value">{{ cash }}</span>
+        <span class="value">${{ cash|round(2)|number_format(2) }}</span>
     </div>
     <div class="infoblock">
         <span class="metric">Annual return</span>
-        <span class="value">{{ annualReturn }}</span>
+        <span class="value">${{ annualReturn|round(2)|number_format(2) }}</span>
     </div>
 {% endblock %}

@@ -18,8 +18,10 @@
         "symfony/yaml": "5.0.*"
     },
     "require-dev": {
+        "symfony/debug-pack": "^1.0",
         "symfony/maker-bundle": "^1.14",
-        "symfony/profiler-pack": "^1.0"
+        "symfony/profiler-pack": "^1.0",
+        "symfony/var-dumper": "5.0.*"
     },
     "config": {
         "preferred-install": {

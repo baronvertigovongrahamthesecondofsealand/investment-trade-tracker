@@ -68,6 +68,16 @@ class Stock
      */
     private $transactions;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isWatchlistLong;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isWatchlistShort;
+
     public function __construct()
     {
         $this->trades = new ArrayCollection();
@@ -211,6 +221,24 @@ class Stock
         return round($gain,2);
     }
 
+    public function getSoldProfit($type) {
+        $profit = 0;
+
+        $trades = $this->getTrades($type);
+
+        $trades = $trades->filter(function($trade) {
+            return ($trade->getOrderType() == 'Sell' || $trade->getOrderType() == 'Expired');
+        });
+
+        foreach ($trades as $trade) {
+            $difference = ($trade->getTradeType() == 'Short') ? ($trade->getAdjustedPrice() -$trade->getPrice()) : ($trade->getPrice() -$trade->getAdjustedPrice());
+
+            $profit += $trade->getQuantity() *$difference;
+        }
+
+        return $profit;
+    }
+
     public function getStockType(): ?string
     {
         return $this->stockType;
@@ -298,6 +326,30 @@ class Stock
                 $transaction->setStock(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isWatchlistLong(): ?bool
+    {
+        return $this->isWatchlistLong;
+    }
+
+    public function setWatchlistLong(bool $isWatchlistLong): self
+    {
+        $this->isWatchlistLong = $isWatchlistLong;
+
+        return $this;
+    }
+
+    public function isWatchlistShort(): ?bool
+    {
+        return $this->isWatchlistShort;
+    }
+
+    public function setWatchlistShort(bool $isWatchlistShort): self
+    {
+        $this->isWatchlistShort = $isWatchlistShort;
 
         return $this;
     }

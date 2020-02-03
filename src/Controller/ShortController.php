@@ -13,17 +13,14 @@ class ShortController extends BaseController {
 
     public $tradeType       = 'Short';
     public $viewRoute       = 'short_main';
-    public $viewTemplate    = 'short/view.html.twig';
     public $detailRoute     = 'short_detail';
 
     public function detail(Request $request, TradeManager $tradeManager) {
-        $this->detailFormBuilder = $this->createFormBuilder(new Stock());
-        $this->detailFormBuilder
-            ->add('shortTarget', NumberType::class)
-            ->add('nextEarningsAt', DateType::class, [
-                'data' => new \DateTime()
-            ])
-            ->add('submit', SubmitType::class);
+        $this->init($request);
+
+        $this->detailFormBuilder = $this->getDetailForm([
+            'shortTarget' => NumberType::class
+        ]);
 
         return parent::detail($request, $tradeManager);
     }

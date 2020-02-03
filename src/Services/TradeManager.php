@@ -14,6 +14,57 @@ class TradeManager {
         $this->em = $entityManager;
     }
 
+    public function getAccountValue() {
+        $transactions   = $this->em->getRepository('App:Transaction')->findBy([], ['executedAt' => 'ASC']);
+        $stocks         = $this->em->getRepository('App:Stock')->createQueryBuilder('s')
+            ->leftJoin('s.trades', 't')
+            ->orderBy('t.executedAt', 'ASC')
+            ->getQuery()
+            ->execute();
+
+        $totalCash         = 0;
+        $totalValueLong    = 0;
+        $totalValueShort   = 0;
+        $totalValueOption  = 0;
+
+        foreach ($transactions as $transaction) {
+            $transactionValue   = $transaction->getQuantity() *$transaction->getPrice();
+            $totalCash          += $transactionValue;
+        }
+
+        foreach ($stocks as $stock) {
+            $profitLong         = $stock->getSoldProfit('Long');
+            $profitShort        = $stock->getSoldProfit('Short');
+            $profitOption       = $stock->getSoldProfit('Option');
+
+            dump('symbol: '.$stock->getSymbol().', long: '.$profitLong.', short: '.$profitShort.', option: '.$profitOption);
+
+            $totalCash          += $profitLong +$profitShort +$profitOption;
+
+            $valueLong          = $stock->getPrice() *$stock->getQuantity('Long');
+            $valueShort         = $stock->getPrice() *$stock->getQuantity('Short');
+            $valueOption        = $stock->getPrice() *$stock->getQuantity('Option');
+
+            $totalValueLong    += $valueLong;
+            $totalValueShort   += $valueShort;
+            $totalValueOption  += $valueOption;
+        }
+
+        return $totalCash +$totalValueLong +$totalValueOption -$totalValueShort;
+    }
+
+    public function getBuyingPower() {
+        return 0;
+    }
+
+    public function getCash() {
+        return 0;
+    }
+
+    public function getAnnualReturn() {
+        return 0;
+    }
+
     public function createOrGetStock($record, $symbol) {
         $stockType = $record->getTradeType() == 'Option' ? 'Option' : 'Stock';
 

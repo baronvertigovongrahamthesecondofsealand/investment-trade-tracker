@@ -19,35 +19,4 @@ class StockRepository extends ServiceEntityRepository
         parent::__construct($registry, Stock::class);
     }
 
-    public function getAccountValue() {
-        $stocks = $this->findAll();
-
-        $totalCash              = 0;
-        $totalStockValueLong    = 0;
-        $totalStockValueShort   = 0;
-        $totalStockValueOption  = 0;
-
-        foreach ($stocks as $stock) {
-            $stockValueLong     = $stock->getPrice() *$stock->getQuantity('Long');
-            $stockValueShort    = $stock->getPrice() *$stock->getQuantity('Short');
-
-            $totalStockValueLong    += $stockValueLong;
-            $totalStockValueShort   += $stockValueShort;
-        }
-
-        return $totalCash +$totalStockValueLong +$totalStockValueOption -$totalStockValueShort;
-    }
-
-    public function getBuyingPower() {
-        return 0;
-    }
-
-    public function getCash() {
-        return 0;
-    }
-
-    public function getAnnualReturn() {
-        return 0;
-    }
-
 }

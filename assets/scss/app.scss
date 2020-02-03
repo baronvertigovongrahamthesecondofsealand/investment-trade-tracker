@@ -4,6 +4,9 @@
 .trade-data, .trade-data .btn, nav .btn {
     font-size: 12px;
 }
+.trade-data tr.watchlist td {
+    color: #ccc !important;
+}
 .up {
     color: green;
 }
@@ -32,6 +35,64 @@
         left: 10px;
     }
 }
-.highlight {
+tr:not(.watchlist) .highlight {
     background-color: #d4f1d4;
+}
+tr:not(.watchlist) .highlight-old {
+    background-color: #f1c2c2;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#chart-container {
+    display: none;
+    text-align: center;
+
+    & > div {
+        display: inline-block;
+    }
+}
+#chartbar {
+    text-align: center;
+
+    i.clickable {
+        padding: 0 5px;
+    }
+}
+i.clickable {
+    cursor: pointer;
+    color: #999;
+
+    &.disabled,
+    &.disabled:hover {
+        cursor: not-allowed;
+        color: #ccc;
+    }
+    &.active,
+    &:hover {
+        color: #000;
+    }
+}
+#chartSelect:checked + label {
+    background: #5797d7;
+    border-color: #555;
+}
+
+
+.divider {
+    background-color: #888;
+    color: #888;
 }

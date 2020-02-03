@@ -1,1 +1,193 @@
 {% extends 'base.html.twig' %}
+
+{% block content %}
+    {% include 'default/_chart.html.twig' %}
+
+    {% for isWatchlist in [0, 1] %}
+        {% if not isWatchlist %}
+            <h1>{{ tradeType }} trades</h1>
+        {% else %}
+            <h1>Watchlist</h1>
+        {% endif %}
+
+        <table class="table table-striped trade-data {% if not isWatchlist %}data-sortable{% endif %}">
+            {% if not isWatchlist %}
+            <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Traded price</th>
+                <th>Traded value</th>
+                <th>Current price</th>
+                <th>Current value</th>
+                <th>Profit</th>
+                <th>Gain</th>
+                <th>10% price</th>
+                <th>10% profit</th>
+                <th>Target price</th>
+                <th>Target profit</th>
+                <th>Target gain</th>
+                {% if tradeType == 'Long' %}
+                    <th>Next earnings call</th>
+                {% endif %}
+            </tr>
+            </thead>
+            {% endif %}
+
+            {% set total_quantity       = 0 %}
+            {% set total_invested       = 0 %}
+            {% set total_value          = 0 %}
+            {% set total_gain           = 0 %}
+            {% set total_tenValue       = 0 %}
+            {% set total_targetValue    = 0 %}
+
+            <tbody>
+            {% for stock in stocks %}
+                {% set showActive = stock.quantity(tradeType) and not isWatchlist %}
+                {% set showWatchlist = not stock.quantity(tradeType) and isWatchlist and ((tradeType == 'Long' and stock.watchlistLong) or (tradeType == 'Call' and stock.watchlistCall) or (tradeType == 'Short' and stock.watchlistShort)) %}
+
+                {% if showActive or showWatchlist %}
+                    {% set stock__quantity              = stock.quantity(tradeType) %}
+                    {% set stock__tradedPrice           = stock.adjustedPrice(tradeType) %}
+                    {% set stock__tradedValue           = stock__tradedPrice *stock__quantity *(tradeType == 'Option' ? 100 : 1) %}
+                    {% set stock__currentPrice          = stock.price %}
+                    {% set stock__currentValue          = stock__currentPrice *stock__quantity *(tradeType == 'Option' ? 100 : 1) %}
+
+                    {% if tradeType == 'Short' %}
+                        {% set stock__position              = stock__quantity *(tradeType == 'Option' ? 100 : 1) *(stock__tradedPrice -stock__currentPrice) %}
+                    {% else %}
+                        {% set stock__position              = stock__quantity *(tradeType == 'Option' ? 100 : 1) *(stock__currentPrice -stock__tradedPrice) %}
+                    {% endif %}
+
+                    {% if tradeType == 'Short' %}
+                        {% set stock__targetPrice       = stock.shortTarget ? stock.shortTarget : 0 %}
+                    {% elseif tradeType == 'Call' %}
+                        {% set stock__targetPrice       = stock.callTarget ? stock.callTarget : 0 %}
+                    {% else %}
+                        {% set stock__targetPrice       = stock.longTarget ? stock.longTarget : 0 %}
+                    {% endif %}
+
+                    {% if tradeType == 'Short' %}
+                        {% set stock__targetPriceDiff   = stock__tradedPrice -stock__targetPrice %}
+                        {% set stock__targetPriceRatio  = stock__targetPrice ? 1 -(stock__tradedPrice /stock__targetPrice) : 1 %}
+                    {% else %}
+                        {% set stock__targetPriceDiff   = stock__targetPrice -stock__tradedPrice %}
+                        {% set stock__targetPriceRatio  = stock__tradedPrice ? (stock__targetPrice /stock__tradedPrice) -1 : 1 %}
+                    {% endif %}
+
+                    {% set stock__targetValue           = stock__targetPriceDiff *stock__quantity *(tradeType == 'Option' ? 100 : 1) %}
+
+                    {% if tradeType == 'Short' %}
+                        {% set stock__targetGain            = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
+                    {% else %}
+                        {% set stock__targetGain            = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
+                    {% endif %}
+
+                    {% if tradeType == 'Short' %}
+                        {% set stock__tenPrice          = stock__tradedPrice *0.9 %}
+                        {% set stock__tenPriceDiff      = stock__tradedPrice -stock__tenPrice %}
+                        {% set stock__tenPriceRatio     = stock__tenPrice ? (stock__tradedPrice /stock__tenPrice) -1 : 1 %}
+                    {% else %}
+                        {% set stock__tenPrice          = stock__tradedPrice *1.1 %}
+                        {% set stock__tenPriceDiff      = stock__tenPrice -stock__tradedPrice %}
+                        {% set stock__tenPriceRatio     = stock__tradedPrice ? (stock__tenPrice /stock__tradedPrice) -1 : 1 %}
+                    {% endif %}
+                    {% set stock__tenValue              = stock__tenPriceDiff *stock__quantity *(tradeType == 'Option' ? 100 : 1) %}
+                    {% set stock__tenGain               = stock__tenPrice and stock__tenPrice ? (stock__tenPriceRatio *100) : 0 %}
+
+
+                    {% if tradeType == 'Short' %}
+                        {% set highlight_targetPrice    = stock__targetPrice and (stock__targetPrice -stock__currentPrice) > 0 %}
+                        {% set highlight_tenPrice       = stock__tenPrice and (stock__tenPrice -stock__currentPrice) > 0 %}
+                    {% else %}
+                        {% set highlight_targetPrice    = stock__targetPrice and (stock__currentPrice -stock__targetPrice) > 0 %}
+                        {% set highlight_tenPrice       = stock__tenPrice and (stock__currentPrice -stock__tenPrice) > 0 %}
+                    {% endif %}
+                    {% set highlight_currentPrice       = highlight_targetPrice or highlight_tenPrice %}
+                    {% set highlight_earnings           = stock.nextEarningsAt and stock.nextEarningsAt|timeAgo == 'Today' %}
+                    {% set highlight_earnings_old       = stock.nextEarningsAt and 'ago' in stock.nextEarningsAt|timeAgo  %}
+
+                    {% set total_quantity               = total_quantity +stock__quantity %}
+                    {% set total_invested               = total_invested +stock__tradedValue %}
+                    {% set total_value                  = total_value +stock__currentValue %}
+                    {% if tradeType == 'Short' %}
+                        {% set total_priceRatio         = total_value ? 1 -(total_invested /total_value) : 1 %}
+                        {% set total_gain               = total_priceRatio *100 %}
+                    {% else %}
+                        {% set total_priceRatio         = total_value ? (total_value /total_invested) -1 : 1 %}
+                        {% set total_gain               = total_priceRatio *100 %}
+                    {% endif %}
+                    {% set total_tenValue               = total_tenValue +stock__tenValue %}
+                    {% set total_targetValue            = total_targetValue +stock__targetValue %}
+
+                    <tr>
+                        <td class="text"><a href="{{ url(detailRoute, { 'symbol': stock.symbol }) }}">{{ stock.symbol }}</a></td>
+                        <td class="number">{{ stock__quantity }}</td>
+                        <td class="money">{{ stock__tradedPrice|round(2)|number_format(2) }}</td>
+                        <td class="money">{{ stock__tradedValue|round(2)|number_format(2) }}</td>
+                        <td class="money{% if highlight_currentPrice %} highlight{% endif %}">{{ stock__currentPrice|round(2)|number_format(2) }}</td>
+                        <td class="money">{{ stock__currentValue|round(2)|number_format(2) }}</td>
+                        <td class="money{% if stock.gain(tradeType) > 0 %} up{% elseif (stock.gain(tradeType) < 0) %} down{% endif %}">{{ stock__position|number_format(2) }}</td>
+                        <td class="ratio{% if stock.gain(tradeType) > 0 %} up{% elseif (stock.gain(tradeType) < 0) %} down{% endif %}">{{ stock.gain(tradeType)|number_format(2) }}%</td>
+                        <td class="money{% if highlight_tenPrice %} highlight{% endif %}">{{ stock__tenPrice|round(2)|number_format(2) }}</td>
+                        <td class="money">{{ stock__tenValue|round(2)|number_format(2) }}</td>
+                        <td class="money{% if highlight_targetPrice %} highlight{% endif %}">
+                            {% if stock__targetPrice %}
+                                {{ stock__targetPrice|round(2)|number_format(2) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="money">
+                            {% if stock__targetValue %}
+                                {{ stock__targetValue|round(2)|number_format(2) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="ratio">
+                            {% if stock__targetGain %}
+                                {{ stock__targetGain|round(2) }}%
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% if tradeType == 'Long' or tradeType == 'Short' %}
+                        <td class="text{% if highlight_earnings %} highlight{% elseif highlight_earnings_old %} highlight-old{% endif %}">
+                            {% if stock.nextEarningsAt %}
+                                {{ stock.nextEarningsAt|timeAgo }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+
+            {% if not isWatchlist %}
+            <tfoot>
+            <tr>
+                <td class="text">Totals:</td>
+                <td class="number">{{ total_quantity }}</td>
+                <td class="text"></td>
+                <td class="money">{{ total_invested|number_format(2) }}</td>
+                <td class="text"></td>
+                <td class="money">{{ total_value|round(2)|number_format(2) }}</td>
+                <td class="money{% if total_gain > 0 %} up{% elseif (total_gain < 0) %} down{% endif %}">{{ (total_value -total_invested)|round(2)|number_format(2) }}</td>
+                <td class="ratio{% if total_gain > 0 %} up{% elseif (total_gain < 0) %} down{% endif %}">{{ total_gain|number_format(2) }}%</td>
+                <td></td>
+                <td class="money{% if total_tenValue > 0 %} up{% elseif (total_tenValue < 0) %} down{% endif %}">{{ total_tenValue|round(2)|number_format(2) }}</td>
+                <td></td>
+                <td class="money{% if total_targetValue > 0 %} up{% elseif (total_targetValue < 0) %} down{% endif %}">{{ total_targetValue|round(2)|number_format(2) }}</td>
+                <td class="text"></td>
+                {% if tradeType == 'Long' %}
+                    <td></td>
+                {% endif %}
+            </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    {% endfor %}
+{% endblock %}
