@@ -76,6 +76,8 @@ class TradeManager {
             $stock = new Stock();
             $stock->setSymbol($symbol);
             $stock->setStockType($stockType);
+            $stock->setWatchlistLong(false);
+            $stock->setWatchlistShort(false);
             $this->em->persist($stock);
             $this->em->flush();
         }

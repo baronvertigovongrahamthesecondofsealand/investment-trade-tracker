@@ -61,7 +61,7 @@
 
                     {% if tradeType == 'Short' %}
                         {% set stock__targetPrice       = stock.shortTarget ? stock.shortTarget : 0 %}
-                    {% elseif tradeType == 'Call' %}
+                    {% elseif tradeType == 'Option' %}
                         {% set stock__targetPrice       = stock.callTarget ? stock.callTarget : 0 %}
                     {% else %}
                         {% set stock__targetPrice       = stock.longTarget ? stock.longTarget : 0 %}
@@ -78,9 +78,9 @@
                     {% set stock__targetValue           = stock__targetPriceDiff *stock__quantity *(tradeType == 'Option' ? 100 : 1) %}
 
                     {% if tradeType == 'Short' %}
-                        {% set stock__targetGain            = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
+                        {% set stock__targetGain        = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
                     {% else %}
-                        {% set stock__targetGain            = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
+                        {% set stock__targetGain        = stock__tradedPrice and stock__targetPrice ? (stock__targetPriceRatio *100) : 0 %}
                     {% endif %}
 
                     {% if tradeType == 'Short' %}
