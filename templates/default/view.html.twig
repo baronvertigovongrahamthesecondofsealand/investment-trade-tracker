@@ -69,7 +69,7 @@
 
                     {% if tradeType == 'Short' %}
                         {% set stock__targetPriceDiff   = stock__tradedPrice -stock__targetPrice %}
-                        {% set stock__targetPriceRatio  = stock__targetPrice ? 1 -(stock__tradedPrice /stock__targetPrice) : 1 %}
+                        {% set stock__targetPriceRatio  = stock__targetPrice ? 1 -(stock__targetPrice /stock__tradedPrice) : 1 %}
                     {% else %}
                         {% set stock__targetPriceDiff   = stock__targetPrice -stock__tradedPrice %}
                         {% set stock__targetPriceRatio  = stock__tradedPrice ? (stock__targetPrice /stock__tradedPrice) -1 : 1 %}
@@ -121,7 +121,7 @@
                     {% set total_targetValue            = total_targetValue +stock__targetValue %}
 
                     <tr>
-                        <td class="text"><a href="{{ url(detailRoute, { 'symbol': stock.symbol }) }}">{{ stock.symbol }}</a></td>
+                        <td class="text"><a href="{{ url(detailRoute, { 'symbol': stock.symbol }) }}">{{ stock.symbol }}</a> [<a target="_blank" href="https://www.investopedia.com/markets/quote?tvwidgetsymbol={{ stock.symbol }}">chart</a>]</td>
                         <td class="number">{{ stock__quantity }}</td>
                         <td class="money">{{ stock__tradedPrice|round(2)|number_format(2) }}</td>
                         <td class="money">{{ stock__tradedValue|round(2)|number_format(2) }}</td>
@@ -130,7 +130,13 @@
                         <td class="money{% if stock.gain(tradeType) > 0 %} up{% elseif (stock.gain(tradeType) < 0) %} down{% endif %}">{{ stock__position|number_format(2) }}</td>
                         <td class="ratio{% if stock.gain(tradeType) > 0 %} up{% elseif (stock.gain(tradeType) < 0) %} down{% endif %}">{{ stock.gain(tradeType)|number_format(2) }}%</td>
                         <td class="money{% if highlight_tenPrice %} highlight{% endif %}">{{ stock__tenPrice|round(2)|number_format(2) }}</td>
-                        <td class="money">{{ stock__tenValue|round(2)|number_format(2) }}</td>
+                        <td class="money">
+                            {% if stock__tenValue %}
+                                {{ stock__tenValue|round(2)|number_format(2) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td class="money{% if highlight_targetPrice %} highlight{% endif %}">
                             {% if stock__targetPrice %}
                                 {{ stock__targetPrice|round(2)|number_format(2) }}

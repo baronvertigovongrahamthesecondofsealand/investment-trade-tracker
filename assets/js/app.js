@@ -136,7 +136,7 @@ $(function() {
             return false;
         }
 
-        let gainMul = gainVal /100;
+        let gainMul = 1 +(gainVal /100);
 
         let calcVal = $(this).data('buyprice') *gainMul;
 
