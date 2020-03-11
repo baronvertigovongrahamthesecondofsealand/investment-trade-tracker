@@ -226,14 +226,15 @@ class Stock
 
         $trades = $this->getTrades($type);
 
-        $trades = $trades->filter(function($trade) {
+        $filteredTrades = $trades->filter(function($trade) {
             return ($trade->getOrderType() == 'Sell' || $trade->getOrderType() == 'Expired');
         });
 
-        foreach ($trades as $trade) {
-            $difference = ($trade->getTradeType() == 'Short') ? ($trade->getAdjustedPrice() -$trade->getPrice()) : ($trade->getPrice() -$trade->getAdjustedPrice());
+        /** @var $filteredTrades Trade[] $filteredTrade */
+        foreach ($filteredTrades as $filteredTrade) {
+            $difference = ($filteredTrade->getTradeType() == 'Short') ? ($filteredTrade->getAdjustedPrice() -$filteredTrade->getPrice()) : ($filteredTrade->getPrice() -$filteredTrade->getAdjustedPrice());
 
-            $profit += $trade->getQuantity() *$difference;
+            $profit += $filteredTrade->getQuantity() *($filteredTrade->getTradeType() == 'Option' ? 100 : 1) *$difference;
         }
 
         return $profit;

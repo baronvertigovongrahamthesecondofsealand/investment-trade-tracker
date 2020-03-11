@@ -18,6 +18,6 @@
     </div>
     <div class="infoblock">
         <span class="metric">Annual return</span>
-        <span class="value">${{ annualReturn|round(2)|number_format(2) }}</span>
+        <span class="value">{{ (annualReturn *100)|round(2)|number_format(2) }}%</span>
     </div>
 {% endblock %}

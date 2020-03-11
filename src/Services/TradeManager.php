@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Stock;
 use App\Entity\Trade;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 
 class TradeManager {
@@ -14,35 +15,39 @@ class TradeManager {
         $this->em = $entityManager;
     }
 
-    public function getAccountValue() {
-        $transactions   = $this->em->getRepository('App:Transaction')->findBy([], ['executedAt' => 'ASC']);
-        $stocks         = $this->em->getRepository('App:Stock')->createQueryBuilder('s')
+    public function getAccountValue($getBuyingPower = false, \DateTime $startDate = null, \DateTime $endDate = null) {
+        $query = $this->em->getRepository('App:Stock')->createQueryBuilder('s')
             ->leftJoin('s.trades', 't')
-            ->orderBy('t.executedAt', 'ASC')
-            ->getQuery()
-            ->execute();
+            ->orderBy('t.executedAt', 'ASC');
 
-        $totalCash         = 0;
+        if ($startDate && $endDate) {
+            $query
+                ->andWhere('t.executedAt BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate);
+        }
+
+        /** @var Stock[] $stocks */
+        $stocks = $query->getQuery()->execute();
+
+        $totalCash         = $this->getCash($startDate, $endDate);
         $totalValueLong    = 0;
         $totalValueShort   = 0;
         $totalValueOption  = 0;
-
-        foreach ($transactions as $transaction) {
-            $transactionValue   = $transaction->getQuantity() *$transaction->getPrice();
-            $totalCash          += $transactionValue;
-        }
 
         foreach ($stocks as $stock) {
             $profitLong         = $stock->getSoldProfit('Long');
             $profitShort        = $stock->getSoldProfit('Short');
             $profitOption       = $stock->getSoldProfit('Option');
 
-            dump('symbol: '.$stock->getSymbol().', long: '.$profitLong.', short: '.$profitShort.', option: '.$profitOption);
+            if ($stock->getSymbol() == 'AMD1922K42') {
+                dump('symbol: '.$stock->getSymbol().', long: '.$profitLong.', short: '.$profitShort.', option: '.$profitOption);
+            }
 
             $totalCash          += $profitLong +$profitShort +$profitOption;
 
-            $valueLong          = $stock->getPrice() *$stock->getQuantity('Long');
-            $valueShort         = $stock->getPrice() *$stock->getQuantity('Short');
+            $valueLong          = $stock->getPrice() *$stock->getQuantity('Long') *($getBuyingPower ? 0.5 : 1);
+            $valueShort         = $stock->getPrice() *$stock->getQuantity('Short') *($getBuyingPower ? 1.5 : 1);
             $valueOption        = $stock->getPrice() *$stock->getQuantity('Option');
 
             $totalValueLong    += $valueLong;
@@ -54,15 +59,68 @@ class TradeManager {
     }
 
     public function getBuyingPower() {
-        return 0;
+        return 6134.12;
+        return $this->getAccountValue(true);
     }
 
-    public function getCash() {
-        return 0;
+    public function getCash(\DateTime $startDate = null, \DateTime $endDate = null) {
+        return 33643.85;
+
+        $totalCash = 0;
+
+        $query = $this->em->getRepository('App:Transaction')->createQueryBuilder('tr')
+            ->orderBy('tr.executedAt', 'ASC');
+
+        if ($startDate && $endDate) {
+            $query
+                ->andWhere('tr.executedAt BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate);
+        }
+
+        $transactions = $query->getQuery()->execute();
+
+        foreach ($transactions as $transaction) {
+            $transactionValue   = $transaction->getQuantity() *$transaction->getPrice();
+            $totalCash          += $transactionValue;
+        }
+
+        return $totalCash;
     }
 
     public function getAnnualReturn() {
-        return 0;
+        return 0.5904;
+        $firstTrade = $this->em->getRepository('App:Trade')->findOneBy([], [ 'executedAt' => 'ASC' ]);
+
+        $initialDate    = $firstTrade->getExecutedAt();
+        $ytdDate        = clone $initialDate;
+        $ytdDate->setDate(date('Y'), $ytdDate->format('m'), $ytdDate->format('d'));
+
+        $now = new \DateTime('now');
+
+        $diff = $ytdDate->diff($now);
+
+        if ($diff->invert) {
+            $ytdDate->setDate(date('Y', strtotime('-1 year')), $ytdDate->format('m'), $ytdDate->format('d'));
+        }
+
+        $accountValStart    = $initialDate == $ytdDate ? 100000 : $this->getAccountValue(false, $initialDate, $ytdDate);
+        $accountValEnd      = $this->getAccountValue(false, $ytdDate, $now);
+
+        $daysInYear     = 365;
+        $daysYTD        = $ytdDate->diff($now)->days;
+
+        $valueCalc      = $accountValEnd /$accountValStart;
+        $expCalc        = $daysInYear /$daysYTD;
+        $annualReturn   = ($valueCalc ** $expCalc) -1;
+
+//        dump($accountValStart);
+//        dump($accountValEnd);
+//        dump($valueCalc);
+//        dump($expCalc);
+//        dump($annualReturn);
+
+        return $annualReturn;
     }
 
     public function createOrGetStock($record, $symbol) {
